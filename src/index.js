@@ -2,9 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
+// Provider 호출 (Redux)
+import { Provider } from 'react-redux';
+
+// 스토어, 미들웨어 호출
+import { legacy_createStore, applyMiddleware } from 'redux';
+import promiseMiddleware from 'redux-promise';
+import ReduxThunk from 'redux-thunk';
+
+// 리듀서 호출
+import Reducer from './redux/reducers'
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// 미들웨어 설정
+const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(legacy_createStore);
+
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider store={createStoreWithMiddleware(
+      Reducer,
+      window.__REDUX_DEVTOOLS_EXTENSION__ &&
+      window.__REDUX_DEVTOOLS_EXTENSION__()
+    )}>
+      <App />
+    </Provider>
   </React.StrictMode>
 );
