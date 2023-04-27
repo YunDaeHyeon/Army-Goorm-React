@@ -10,3 +10,10 @@
 !! 대체로 RTK를 사용하는 것을 권장하지만, 이름만 변경해서 사용해도 X.
 !! createStore -> legacy_createStore  
 !! 참고 : [redux createStore deprecated ?!](https://velog.io/@201_steve/redux-createStore-deprecated)  
+
+# Firebase
+1. firebase  
+
+# CSS Framework
+1. react-bootstrap bootstrap  
+2. react-icons  

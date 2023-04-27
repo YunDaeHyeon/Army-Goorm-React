@@ -13,6 +13,9 @@ import ReduxThunk from 'redux-thunk';
 // 리듀서 호출
 import Reducer from './redux/reducers'
 
+// React Bootstrap 호출
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 // 미들웨어 설정
