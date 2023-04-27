@@ -108,3 +108,7 @@ unscribe();
 5. Materialize  
   
 ! 해당 프로젝트에는 React BootStrap, React Icons를 사용하였음.  
+
+# react-hook-form
+ : 입력창의 유효성 검사를 효율적으로 진행하기 위해 해당 라이브러리 사용.  
+ 

@@ -1,6 +1,7 @@
 # React
 1. react, react-dom  
 2. react-router-dom  
+3. react-hook-form
   
 # Redux
 1. redux  
