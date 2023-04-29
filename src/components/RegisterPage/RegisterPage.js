@@ -18,6 +18,9 @@ function RegisterPage() {
   // submit시 나타내는 에러에 대한 state
   const [errorFromSubmit, setErrorFromSubmit] = useState("");
 
+  // loading State
+  const [loading, setLoading] = useState(false);
+
   // name : password의 DOM 가져오기
   const password = useRef();
   // password의 필드 값(current)을 watch로 가져오기
@@ -26,16 +29,19 @@ function RegisterPage() {
   // onSubmit 이벤트 (비동기)
   const onSubmit = async (data) => {
     try{
-    // firebase에 이메일, 비밀번호 던진 후 createdUser에 반환
-    let createdUser = await firebase
+      setLoading(true); // submit을 누른 직후는 true
+      // firebase에 이메일, 비밀번호 던진 후 createdUser에 반환
+      let createdUser = await firebase
         .auth() // 인증모델 가져오기
         .createUserWithEmailAndPassword(
           data.email,
           data.password
         )
+      setLoading(false); // submit을 누르고 회원가입이 완료되면 false
       console.log('createdUser', createdUser);
     }catch(error){
       setErrorFromSubmit(error.message);
+      setLoading(false);
       setTimeout(() => {
         setErrorFromSubmit("");
       }, 5000);
@@ -117,7 +123,7 @@ function RegisterPage() {
         { // 만약, errorFromSubmit이 존재한다면 (에러가 발생했다면)
           errorFromSubmit && <p>{errorFromSubmit}</p>
         }
-        <input type='submit'/>
+        <input type='submit' disabled={loading}/>
         <Link style={{color:'gray', textDecoration: 'none'}} to="/login">이미 아이디가 있다면...</Link>
       </form>
     </div>
