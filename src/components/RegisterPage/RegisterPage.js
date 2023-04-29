@@ -1,32 +1,56 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { Link } from "react-router-dom";
 // react-hook-form 호출
 import { useForm } from 'react-hook-form';
-
+// firebase 호출
+import firebase from '../../firebase';
 import "./RegisterPage_style.css";
 
 function RegisterPage() {
   /*
     watch : 해당 입력창에 나타나는 이벤트 확인
     errors : 에러 수집
+    handleSubmit : 폼에서 submit 버튼을 눌렀을 때
   */
   // useForm()의 내부 파라미터로 mode가 존재한다. ex) mode : "onChange"
-  const { register, watch, formState: {errors}} = useForm({mode : "onBlur"});
+  const { register, watch, formState: {errors}, handleSubmit} = useForm({mode : "onBlur"});
+
+  // submit시 나타내는 에러에 대한 state
+  const [errorFromSubmit, setErrorFromSubmit] = useState("");
 
   // name : password의 DOM 가져오기
   const password = useRef();
   // password의 필드 값(current)을 watch로 가져오기
   password.current = watch("password");
 
-  // name : email의 input 관찰
-  // console.log(watch("email"));
+  // onSubmit 이벤트 (비동기)
+  const onSubmit = async (data) => {
+    try{
+    // firebase에 이메일, 비밀번호 던진 후 createdUser에 반환
+    let createdUser = await firebase
+        .auth() // 인증모델 가져오기
+        .createUserWithEmailAndPassword(
+          data.email,
+          data.password
+        )
+      console.log('createdUser', createdUser);
+    }catch(error){
+      setErrorFromSubmit(error.message);
+      setTimeout(() => {
+        setErrorFromSubmit("");
+      }, 5000);
+    }
+  }
 
   return (
     <div className='auth-wrapper'>
       <div style={{textAlign: 'center'}}>
         <h3>Register</h3>
       </div>
-      <form>
+      {
+        // 해당 handleSubmit(onSubmit)은 react-hook-form인 경우에만.
+      }
+      <form onSubmit={handleSubmit(onSubmit)}>
         <label>Email</label>
         <input
           name="email"
@@ -89,6 +113,9 @@ function RegisterPage() {
         {
           errors.password_confirm && errors.password_confirm.type === "validate" &&
           <p>The passwords do not match</p>
+        }
+        { // 만약, errorFromSubmit이 존재한다면 (에러가 발생했다면)
+          errorFromSubmit && <p>{errorFromSubmit}</p>
         }
         <input type='submit'/>
         <Link style={{color:'gray', textDecoration: 'none'}} to="/login">이미 아이디가 있다면...</Link>
