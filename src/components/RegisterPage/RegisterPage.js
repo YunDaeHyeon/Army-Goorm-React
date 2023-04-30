@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // react-hook-form 호출
 import { useForm } from 'react-hook-form';
 // firebase 호출
@@ -9,6 +9,7 @@ import "./RegisterPage_style.css";
 import md5 from 'md5';
 
 function RegisterPage() {
+  let navigate = useNavigate();
   /*
     watch : 해당 입력창에 나타나는 이벤트 확인
     errors : 에러 수집
@@ -56,6 +57,10 @@ function RegisterPage() {
           
       setLoading(false); // submit을 누르고 회원가입이 완료되면 false
       console.log('createdUser', createdUser);
+
+      alert('회원가입 되었습니다!');
+      navigate("/login"); // 로그인 페이지로 이동
+      
     }catch(error){
       setErrorFromSubmit(error.message);
       setLoading(false);
