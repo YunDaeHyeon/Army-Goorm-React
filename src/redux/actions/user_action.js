@@ -1,0 +1,11 @@
+import {
+    SET_USER
+} from './types';
+
+// 유저 상태 변환 ACTION
+export function setUser(user){
+    return{
+        type: SET_USER, // type은 액션의 이름.
+        payload: user // 넘어온 유저의 정보를 reducer로 전달
+    }
+}

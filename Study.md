@@ -39,7 +39,7 @@ function addTodo(data){
     }
 }
 
-const changeInput = text - > ({
+const changeInput = text => ({
     type: 'CHANGE_INPUT',
     text
 })
@@ -144,3 +144,10 @@ DB 루트에 데이터가 저장된다.
 # BrowserRouter이 있는 파일에 useNavigate 사용 시 오류나는 이유
  : BrowserRouter를 App.js가 아닌 더 상위에 올려야한다.  
  : index.js에서 변경.  
+
+# 로그인 한 유저의 정보를 어디에서나 사용할 수 있도록.
+ : redux 스토어에 저장.  
+  
+!! Redux Data Save Flow(strict unidirectional data flow)
+ACTION -> REDUCER -> STORE -> SUBSCRIBE -> React Component -> Dispatch(action) 
+-> ACTION ... 반복   
