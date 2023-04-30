@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
+// react-router-dom 호출
+import { BrowserRouter } from 'react-router-dom';
+
 // Provider 호출 (Redux)
 import { Provider } from 'react-redux';
 
@@ -28,7 +31,9 @@ root.render(
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
       window.__REDUX_DEVTOOLS_EXTENSION__()
     )}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </Provider>
   </React.StrictMode>
 );

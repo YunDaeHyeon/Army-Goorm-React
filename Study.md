@@ -140,3 +140,7 @@ firebase.database().ref("users")
 ref(Reference), child, set으로 변경.  
 !! 이때, ref의 파라미터로는 경로가 지정될 수 있다. 만약, 명시하지 않을 시 
 DB 루트에 데이터가 저장된다.  
+
+# BrowserRouter이 있는 파일에 useNavigate 사용 시 오류나는 이유
+ : BrowserRouter를 App.js가 아닌 더 상위에 올려야한다.  
+ : index.js에서 변경.  
