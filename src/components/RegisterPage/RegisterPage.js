@@ -46,6 +46,14 @@ function RegisterPage() {
         photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`,
       });
 
+      // 데이터베이스(FireBase) 저장
+      await firebase.database().ref("users")
+        .child(createdUser.user.uid) // 생성된 유저의 uid 지정
+        .set({
+          name : createdUser.user.displayName,
+          image : createdUser.user.photoURL
+        });
+          
       setLoading(false); // submit을 누르고 회원가입이 완료되면 false
       console.log('createdUser', createdUser);
     }catch(error){

@@ -114,3 +114,29 @@ unscribe();
  
 # md5
  : 프로필 이미지를 업로드 할 때 파라미터를 유니크한 값으로 명시하기 위해 사용.  
+
+# Firebase의 realtimeDatabase 사용법
+```SQL
+# MySQL의 경우
+INSERT INTO users(email, displayName, photoURL) VALUES
+(kayuaao12@naver.com, kayuaao12, gravatar...)
+
+# MongoDB의 경우
+UserModel.create({ 
+    email : "kayuaao12@naver.com",
+    displayName : "kayuaao12",
+    photoURL: "gravatar"
+})
+
+# FireBase
+firebase.database().ref("users")
+    .child(userId)
+    .set({
+        name : displayName,
+        image: photoURL
+    })
+```
+!! 즉, MySQL에서 테이블, 도메인, 컬럼들이 FireBase에서는 각각
+ref(Reference), child, set으로 변경.  
+!! 이때, ref의 파라미터로는 경로가 지정될 수 있다. 만약, 명시하지 않을 시 
+DB 루트에 데이터가 저장된다.  
