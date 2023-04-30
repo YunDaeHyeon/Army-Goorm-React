@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 // firebase 호출
 import firebase from '../../firebase';
 import "./RegisterPage_style.css";
+// md5 호출
+import md5 from 'md5';
 
 function RegisterPage() {
   /*
@@ -37,6 +39,13 @@ function RegisterPage() {
           data.email,
           data.password
         )
+      // 사용자 프로필 이미지, 이름 업로드
+      await createdUser.user.updateProfile({
+        displayName: data.name, // 사용자 이름
+        // gravatar를 이용한 무작위 이미지 생성 후 저장 (사용자 이메일 기반)
+        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`,
+      });
+
       setLoading(false); // submit을 누르고 회원가입이 완료되면 false
       console.log('createdUser', createdUser);
     }catch(error){
