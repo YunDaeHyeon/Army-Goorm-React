@@ -12,7 +12,7 @@ import firebase from './firebase';
 // redux 호출 (Dispatch는 상태 저장, Selector는 상태 호출)
 import { useDispatch, useSelector } from "react-redux";
 // redux 커스텀 action 호출
-import { setUser } from "./redux/actions/user_action";
+import { setUser, clearUser } from "./redux/actions/user_action";
 
 function App() {
   let navigate = useNavigate();
@@ -29,18 +29,22 @@ function App() {
         dispatch(setUser(user));
       }else{ // user 객체가 존재하지 않으면 로그인 X
         navigate("/login");
+        /* user 객체가 존재하지 않은 경우는 2가지.
+        로그인을 하지 않았거나 로그아웃을 한 경우.
+        따라서 clearUser이라는 action을 만들어서 State를 제거 */
+        dispatch(clearUser());
       }
     })
   }, [navigate, dispatch]);
 
-  // // 유저의 정보가 불러오는 중이라면 Loading 중 호출
-  // if(isLoading){ // true : 불러오는 중
-  //   return(
-  //     <div>
-  //       ...Loading
-  //     </div>
-  //   );
-  // }else{ // 불러와졌다면, false : 완료
+  // 유저의 정보가 불러오는 중이라면 Loading 중 호출
+  if(isLoading){ // true : 불러오는 중
+    return(
+      <div>
+        ...Loading
+      </div>
+    );
+  }else{ // 불러와졌다면, false : 완료
     return(
       <Routes>
         <Route path="/" element={<ChatPage/>}/>
@@ -48,7 +52,7 @@ function App() {
         <Route path="/register" element={<RegisterPage/>}/>
       </Routes>
     );
-  //  }
+  }
 }
 
 export default App;
