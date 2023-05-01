@@ -33,14 +33,14 @@ function App() {
     })
   }, [navigate, dispatch]);
 
-  // 유저의 정보가 불러오는 중이라면 Loading 중 호출
-  if(isLoading){ // true : 불러오는 중
-    return(
-      <div>
-        ...Loading
-      </div>
-    );
-  }else{ // 불러와졌다면, false : 완료
+  // // 유저의 정보가 불러오는 중이라면 Loading 중 호출
+  // if(isLoading){ // true : 불러오는 중
+  //   return(
+  //     <div>
+  //       ...Loading
+  //     </div>
+  //   );
+  // }else{ // 불러와졌다면, false : 완료
     return(
       <Routes>
         <Route path="/" element={<ChatPage/>}/>
@@ -48,7 +48,7 @@ function App() {
         <Route path="/register" element={<RegisterPage/>}/>
       </Routes>
     );
-  }
+  //  }
 }
 
 export default App;

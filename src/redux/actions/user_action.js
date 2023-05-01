@@ -2,7 +2,7 @@ import {
     SET_USER
 } from './types';
 
-// 유저 상태 변환 ACTION
+// 유저 상태 변환 Action 생성 함수
 export function setUser(user){
     return{
         type: SET_USER, // type은 액션의 이름.
