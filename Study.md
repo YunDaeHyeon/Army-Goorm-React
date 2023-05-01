@@ -166,3 +166,8 @@ ACTION -> REDUCER -> STORE -> SUBSCRIBE -> React Component -> Dispatch(action)
 !: Chore - 빌드 태스트 업데이트, 패키지 매니저를 설정하는 경우(프로덕션 코드 변경 X)  
 !: Rename - 파일 혹은 폴더명을 수정하거나 옮기는 작업만인 경우  
 !: Remove - 파일을 삭제하는 작업만 수행한 경우  
+
+# 프로필 이미지 수정
+만약, Firebase가 아닌 `Node`를 사용한 경우는 이미지를 업로드 시킬 때 `Multer` 라이브러리를 사용하여 하드디스크에 이미지를 처리 후 DB에 업로드시킨 뒤 가져오는 형식을 취한다.  
+  
+! Firebase의 경우는 React에서 이미지를 `Firebase Storage`에 업로드 한 뒤 `Firebase DB`에 저장한다. (이때, Storage와 DB는 다른 서비스임을 유의.)  
