@@ -1,6 +1,7 @@
 import {
     SET_USER,
-    CLEAR_USER
+    CLEAR_USER,
+    SET_PHOTO_URL
 } from './types';
 
 // 유저 상태 변환 Action 생성 함수
@@ -15,5 +16,13 @@ export function setUser(user){
 export function clearUser(){
     return{
         type: CLEAR_USER
+    }
+}
+
+// 프로필 이미지 변경 Action 생성 함수
+export function setPhotoURL(photoURL){
+    return{
+        type: SET_PHOTO_URL,
+        payload: photoURL
     }
 }

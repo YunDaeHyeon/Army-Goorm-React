@@ -1,7 +1,8 @@
 // Action의 Type(이름) 가져오기
 import {
     SET_USER,
-    CLEAR_USER
+    CLEAR_USER,
+    SET_PHOTO_URL
 } from "../actions/types";
 
 const initialUserState = { 
@@ -28,6 +29,14 @@ export default function(state = initialUserState, action){
                 ...state,
                 currentUser: 'null',
                 isLoading: false,
+            }
+        // 프로필 이미지 변경
+        case SET_PHOTO_URL:
+            return{
+                ...state,
+                // 기존 상태는 전부 그대로, photoURL만 변경
+                currentUser: {...state.currentUser, photoURL: action.payload},
+                isLoading: false
             }
         // 만약 변경될 상태가 존재하지 않는다면
         default:
