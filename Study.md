@@ -171,3 +171,6 @@ ACTION -> REDUCER -> STORE -> SUBSCRIBE -> React Component -> Dispatch(action)
 만약, Firebase가 아닌 `Node`를 사용한 경우는 이미지를 업로드 시킬 때 `Multer` 라이브러리를 사용하여 하드디스크에 이미지를 처리 후 DB에 업로드시킨 뒤 가져오는 형식을 취한다.  
   
 ! Firebase의 경우는 React에서 이미지를 `Firebase Storage`에 업로드 한 뒤 `Firebase DB`에 저장한다. (이때, Storage와 DB는 다른 서비스임을 유의.)  
+
+# mime-types 모듈 적용
+ : 업로드된 파일의 타입을 확인하기 위하여 해당 모듈을 설치한다.  

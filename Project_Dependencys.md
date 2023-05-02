@@ -2,7 +2,8 @@
 1. react, react-dom  
 2. react-router-dom  
 3. react-hook-form  
-4. md5
+4. md5  
+5. mime-types  
   
 # Redux
 1. redux  
