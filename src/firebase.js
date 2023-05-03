@@ -2,6 +2,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 import "firebase/compat/database";
+
 // import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration

@@ -8,9 +8,6 @@ import { Image } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 // firebase
 import firebase from '../../../firebase';
-// mime-types 호출
-import mime from "mime-types";
-
 // action 호출 (redux)
 import { setPhotoURL } from '../../../redux/actions/user_action';
 
@@ -45,9 +42,10 @@ function UserPanel() {
     const handleUploadImage = async (event) => {
         // 선택한 파일 불러오기
         const file = event.target.files[0];
+        console.log('file', file);
 
         // 선택한 파일의 메타데이터 불러오기
-        const metadata = {contentType: mime.lookup(file.name)};
+        const metadata = {contentType: file.type};
 
         // 파일을 스토리지 버킷으로 추가
         try{
@@ -72,15 +70,15 @@ function UserPanel() {
             dispatch(setPhotoURL(downloadURL));
 
             // 변경된 이미지를 데이터베이스에 저장
-            await firebase.database.ref("users")
+            await firebase.database().ref('users')
                 .child(user.uid)
                 // 데이터베이스 수정
                 .update({ image : downloadURL})
 
         }catch(error){
             // 오류 발생 시
+            console.log('error', error);
         }
-        console.log("file", file);
     }
 
   return (
