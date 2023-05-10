@@ -25,7 +25,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(legacy_createStore);
 
 root.render(
-  <React.StrictMode>
     <Provider store={createStoreWithMiddleware(
       Reducer,
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
@@ -35,5 +34,4 @@ root.render(
         <App />
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>
 );

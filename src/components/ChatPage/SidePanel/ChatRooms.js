@@ -20,6 +20,28 @@ export class ChatRooms extends Component {
     name: "", // 방 생성 제어 state
     description: "", // 방 생성 제어 state
     chatRoomsRef: firebase.database().ref("chatRooms"), // 채팅 룸에 대한 ref
+    chatRooms: [], // 채팅방 리스트
+  }
+
+  // 해당 함수는 ChatRooms 컴포넌트 호출 시 실행된다.
+  // ex) submit 시 render() 실행
+  componentDidMount(){
+    // 컴포넌트 호출 시 해당 Chat Rooms 출력
+    this.AddChatRoomsListeners();
+  }
+
+  AddChatRoomsListeners = () => {
+    let chatRoomsArray = [];
+
+    // chatRoomsRef에 데이터가 변경되는 점을 계속해서 읽어온다.
+    // 즉, 파이어베이스에 저장된 데이터를 실시간으로 읽어온다.
+    // !! 다른 사람이 저장한 데이터도 실시간으로 불러온다는 의미 !!
+    this.state.chatRoomsRef.on("child_added", DataSnapshot => {
+        // 해당 DataSnapshot props로 실시간으로 읽어온 데이터를 불러온다.
+        chatRoomsArray.push(DataSnapshot.val());
+        // 불러온 데이터 state 적용
+        this.setState({ chatRooms: chatRoomsArray});
+    });
   }
 
   // 방 생성 Modal 열기
@@ -39,6 +61,15 @@ export class ChatRooms extends Component {
 
   // 방 생성 시 유효성 체크
   isFormValid = (name, description) => name && description;
+
+  // 채팅방 리스트 렌더링
+  renderChatRooms = (chatRooms) =>
+      // 만약, chatRooms가 0보다 크면 (즉, 채팅방이 1개 이상 있으면)
+      chatRooms.length > 0 && chatRooms.map(room => (
+        <li key={room.id}>
+          # {room.name}
+        </li>
+      ));
 
   // 생성되는 방의 정보 구성
   addChatRoom = async () => {
@@ -96,6 +127,10 @@ export class ChatRooms extends Component {
             }}/>
 
         </div>
+
+        <ul style={{ listStyleType: 'none', padding: 0}}>
+          {this.renderChatRooms(this.state.chatRooms)}
+        </ul> 
 
         {/* 채팅방 Modal*/}
         <Modal show={this.state.show} onHide={this.handleClose}>
