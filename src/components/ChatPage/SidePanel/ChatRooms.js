@@ -34,6 +34,14 @@ export class ChatRooms extends Component {
     this.AddChatRoomsListeners();
   }
 
+  // 해당 함수는 ChatRooms가 파괴되었을 때 실행된다.
+  // ChatRooms 컴포넌트는 최초 실행 시 파이어베이스에서 Listener를 통하여
+  // 계속해서 데이터를 주고받는다. 컴포넌트가 필요하지 않을때는 이를 제한한다.
+  componentWillUnmount(){
+    // .off()를 통하여 Listener를 off 시키면 더 이상 데이터가 전달되지 않는다.
+    this.state.chatRoomsRef.off();
+  }
+
   // 만약, 최초로 새로고침이 발생했을 경우 임의적으로 첫 번째 채팅방을 state에 저장한다.
   setFirstChatRoom = () => {
     const firstChatRoom = this.state.chatRooms[0];
