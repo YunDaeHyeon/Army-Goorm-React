@@ -12,6 +12,8 @@ import Form from 'react-bootstrap/Form';
 import { connect } from 'react-redux';
 // firebase
 import firebase from "../../../firebase";
+// redux action 호출
+import { setCurrentChatRoom } from '../../../redux/actions/chatRoom_action';
 
 export class ChatRooms extends Component {
   // 클래스컴포넌트의 state 선언 방식
@@ -21,6 +23,8 @@ export class ChatRooms extends Component {
     description: "", // 방 생성 제어 state
     chatRoomsRef: firebase.database().ref("chatRooms"), // 채팅 룸에 대한 ref
     chatRooms: [], // 채팅방 리스트
+    firstLoad: true, // 채팅방 리스트를 최초로 불러왔을 경우 판단
+    activeChatRoomId: "",// 각 채팅방의 ID
   }
 
   // 해당 함수는 ChatRooms 컴포넌트 호출 시 실행된다.
@@ -28,6 +32,21 @@ export class ChatRooms extends Component {
   componentDidMount(){
     // 컴포넌트 호출 시 해당 Chat Rooms 출력
     this.AddChatRoomsListeners();
+  }
+
+  // 만약, 최초로 새로고침이 발생했을 경우 임의적으로 첫 번째 채팅방을 state에 저장한다.
+  setFirstChatRoom = () => {
+    const firstChatRoom = this.state.chatRooms[0];
+    // 만약, 최초로 새로고침을 진행했으며 채팅방이 하나 이상 존재한다면
+    if(this.state.firstLoad && this.state.chatRooms.length > 0){
+      // redux 업로드 진행
+      this.props.dispatch(setCurrentChatRoom(firstChatRoom));
+      // 첫 번째 채팅방 active
+      this.setState({ activeChatRoomId: firstChatRoom.id })
+    }
+    // 최초로 새로고침을 진행하였으면 firstLoad를 false로 바꾼다.
+    // 이유는, 첫 번째 채팅방을 임의적으로 딱 한번만 명시하면 되기 때문.
+    this.setState({ firstLoad: false });
   }
 
   AddChatRoomsListeners = () => {
@@ -40,7 +59,8 @@ export class ChatRooms extends Component {
         // 해당 DataSnapshot props로 실시간으로 읽어온 데이터를 불러온다.
         chatRoomsArray.push(DataSnapshot.val());
         // 불러온 데이터 state 적용
-        this.setState({ chatRooms: chatRoomsArray});
+        this.setState({ chatRooms: chatRoomsArray}, 
+          () => this.setFirstChatRoom());
     });
   }
 
@@ -62,11 +82,28 @@ export class ChatRooms extends Component {
   // 방 생성 시 유효성 체크
   isFormValid = (name, description) => name && description;
 
+  // 클릭한 채팅방 정보 redux에 업로드
+  changeChatRoom = (room) => {
+    // Class Component에서는 this.props.dispatch()의 형식으로 redux 업로드
+    this.props.dispatch(setCurrentChatRoom(room));
+    // 선택된 채팅방 active
+    this.setState({ activeChatRoomId: room.id });
+  }
+
   // 채팅방 리스트 렌더링
   renderChatRooms = (chatRooms) =>
       // 만약, chatRooms가 0보다 크면 (즉, 채팅방이 1개 이상 있으면)
       chatRooms.length > 0 && chatRooms.map(room => (
-        <li key={room.id}>
+        <li 
+          key={room.id}
+          style={{ 
+            // 특정 채팅방 클릭시(active) 배경색 변경
+            backgroundColor: room.id === this.state.activeChatRoomId &&
+            "#ffffff45",
+            cursor: 'pointer'
+          }}
+          onClick={() => this.changeChatRoom(room) /* 클릭한 채팅방 정보 redux 저장 */}
+        >
           # {room.name}
         </li>
       ));
@@ -118,7 +155,7 @@ export class ChatRooms extends Component {
           display: 'flex', alignItems: 'center'
         }}>
           <FaRegSmileWink style={{ marginRight: 3 }}/>
-          CHAT ROOMS {" "} (1)
+          CHAT ROOMS {" "} ({this.state.chatRooms.length})
           <FaPlus 
             onClick={this.handleShow}
             style={{
