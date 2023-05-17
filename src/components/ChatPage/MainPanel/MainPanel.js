@@ -1,8 +1,8 @@
 // 해당 코드는 클래스 컴포넌트와 함수형 컴포넌트가 합쳐짐.
-import React, { Component } from 'react'
-import MessageHeader from './MessageHeader'
-import MessageForm from './MessageForm'
-import Message from './Message'
+import React, { Component } from 'react';
+import MessageHeader from './MessageHeader';
+import MessageForm from './MessageForm';
+import Message from './Message';
 import { connect } from 'react-redux';
 import firebase from '../../../firebase';
 
@@ -45,18 +45,20 @@ export class MainPanel extends Component {
   renderMessages = (messages) => {
     messages.length > 0 && // messages가 하나 이상의 메시지를 가지고 있다면
     // Message Component 사용
+    console.log("renderMessage 실행");
     messages.map(message => (
-      <Message
-        key={message.timestamp}
-        message={message}
-        user={this.props.user}
-      />
+        <Message
+          key={message.timeStamp}
+          message={message}
+          user={this.props.user}
+        />
     ))
   }
 
   render() {
     // render()가 실행될때마다 state에서 messages 가져오기
     const { messages } = this.state;
+
     return (
         <div style={{ padding: '2rem 2rem 0 2rem'}}>
             
@@ -71,8 +73,9 @@ export class MainPanel extends Component {
                 marginBottom: '1rem',
                 overflowY: 'auto'
             }}>
-            </div>
               {this.renderMessages(messages)}
+            </div>
+
             <MessageForm/>
 
         </div>

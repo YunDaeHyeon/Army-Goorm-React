@@ -12,7 +12,6 @@ import { FaLock } from 'react-icons/fa'
 import { MdFavorite } from 'react-icons/md';
 import { AiOutlineSearch } from 'react-icons/ai';
 
-
 function MessageHeader() {
   return (
     <div style={{
