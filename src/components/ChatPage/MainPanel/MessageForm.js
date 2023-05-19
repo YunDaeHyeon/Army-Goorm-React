@@ -75,17 +75,38 @@ function MessageForm() {
       let uploadTask = storageRef.child(filePath).put(file, metadata)
 
       // 파일 저장 퍼센티지 구하기 (리스너 사용)
+      // on 메소드의 첫 번째 인자 : 파일이 업로드 될 때
+      // 두 번째 인자 : 파일 업로드에 대한 정보
       uploadTask.on("state_changed", UploadTaskSnapshot => {
         const percentage = Math.round(
           // (얼마나 전송되었는가) / (최종 이미지 크기) * 100
           (UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
         ) // 소숫점 반올림
         setPercentage(percentage); // percentage state 변경
-      });
+      },
+      // 세 번째 인자 : 에러 처리
+      error => {
+        setLoading(false);
+        alert(error);
+      },
+      () => {
+          // 네 번째 인자 : 파일 업로드가 끝난 뒤 처리 (DB 저장)
+          // -> 저장된 파일을 다운로드 받을 수 있는 URL 가져오기
+          uploadTask.snapshot.ref.getDownloadURL()
+          .then(downloadURL => {
+            console.log("downloadURL", downloadURL);
+            // message collection에 파일 데이터 저장
+            messagesRef
+              .child(chatRoom.id)
+              .push()
+              .set(createMessage(downloadURL))
+            setLoading(false);
+          })
+        }
+      );
     }catch(error){
       alert(error);
     }
-
   }
 
   const handleSubmit = async () => {
@@ -144,6 +165,7 @@ function MessageForm() {
             onClick={handleSubmit}
             className='message-form-button'
             style={{ width: '100%'}}
+            disabled={loading ? true : false}
           >
             SEND
           </button>
@@ -153,6 +175,7 @@ function MessageForm() {
             onClick={handleOpenImageRef}
             className='message-form-button'
             style={{ width: '100%'}}
+            disabled={loading ? true : false}
           >
             UPLOAD
           </button>
@@ -160,6 +183,7 @@ function MessageForm() {
       </Row>
 
       <input 
+        accept='image/jpeg, image/png, image/jpg'
         style = {{ display: "none"}} 
         type="file"
         ref={inputOpenImageRef}
