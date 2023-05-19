@@ -26,13 +26,15 @@ function Message({ message , user }) {
   return (
     <Media>
       <img
-        style={{ borderRadius: '10px'}}
+        style={{ borderRadius: '10px', float: 'left', padding: '5px'}}
         width={48}
         height={48}
         className="mr-3"
         src={message.user.image}
         alt={message.user.name}/>
-      <Media.Body>
+      <Media.Body style={{
+        backgroundColor: isMessageMine(message, user) && "#ECECEC"
+      }}>
         <h6>{message.user.name}
           <span style={{ fontSize: '10px', color: 'gray'}}>
             {timeFromNow(message.timestamp)}
