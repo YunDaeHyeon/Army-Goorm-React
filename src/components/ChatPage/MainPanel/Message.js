@@ -1,19 +1,18 @@
 import React from 'react';
 // React Bootstrap
-import Card from 'react-bootstrap/Card';
+import Media from 'react-bootstrap/Media';
 // timeStamp 커스텀
 import moment from 'moment';
 
 function Message({ message , user }) {
   
   // moment 호출
-  const timeFromNow = timeStamp => moment(timeStamp).fromNow();
+  const timeFromNow = timestamp => moment(timestamp).fromNow();
 
   const isImage = message => {
     // !! hasOwnProperty : 객체가 특정 프로퍼티를 가지고 있는지 판단
     // 즉, image는 가지고 있는데 content는 아니면 true -> is image
     // content는 가지고 있지만 image를 가지고 있지 않으면 false -> is not image
-    
     return message.hasOwnProperty("image") && !message.hasOwnProperty("content");
   }
 
@@ -25,31 +24,27 @@ function Message({ message , user }) {
   }
 
   return (
-    <Card style={{ marginBottom: '3px'}}>
+    <Media>
       <img
         style={{ borderRadius: '10px'}}
         width={48}
         height={48}
-        className='mr-3'
+        className="mr-3"
         src={message.user.image}
-        alt={message.user.name}
-      />
-      <Card.Body style={{ 
-        // 만약, 자신의 메시지가 맞다면 회색처리
-        backgroundColor: isMessageMine(message, user) &&
-        "#ECECEC" }}>
-        <h6>{message.user.name}{" "}
-          <span style={{ fontSize: '10px', color: 'gray' }}>
-            {timeFromNow(message.timeStamp)}
+        alt={message.user.name}/>
+      <Media.Body>
+        <h6>{message.user.name}
+          <span style={{ fontSize: '10px', color: 'gray'}}>
+            {timeFromNow(message.timestamp)}
           </span>
         </h6>
-        {
-        isImage(message) ? // 이미지, 문자열 판별
-          <img style={{ maxWidth: '300px' }} alt="이미지" src={message.image}/>
-          : <p>{message.content}</p>
+        {isImage(message) ?
+          <img style={{ maxWidth: '300px'}} alt="이미지" src={message.image}/>
+          :
+          <p>{message.content}</p>
         }
-      </Card.Body>
-    </Card>
+      </Media.Body>
+    </Media>
   )
 }
 

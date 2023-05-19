@@ -29,7 +29,7 @@ function MessageForm() {
   // 메시지 생성 (넘어온 파라미터(fileUrl)이 존재하지 않다면 null)
   const createMessage = (fileUrl = null) => {
     const message = {
-      timeStamp : firebase.database.ServerValue.TIMESTAMP,
+      timestamp : firebase.database.ServerValue.TIMESTAMP,
       user: {
         id: user.uid,
         name: user.displayName,
@@ -42,6 +42,7 @@ function MessageForm() {
     }else{ // fireUrl이 존재하지 않다는 것은 단순 문자열
       message["content"] = content;
     }
+    console.log("func createMessage start", message);
     return message; // message 반환
   }
 

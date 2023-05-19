@@ -4,6 +4,7 @@ import MainPanel from './MainPanel/MainPanel'
 import SidePanel from './SidePanel/SidePanel'
 // react-redux
 import { useSelector } from 'react-redux'
+// import { v4 as uuidv4 } from 'uuid';
 
 // 사이드, 메인 패널에는 각각 고유한 key를 부여해야 정상적으로
 // render가 된다.

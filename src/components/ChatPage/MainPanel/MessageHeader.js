@@ -7,6 +7,8 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Image from 'react-bootstrap/Image';
 import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 // Icon
 import { FaLock } from 'react-icons/fa'
 import { MdFavorite } from 'react-icons/md';
@@ -44,22 +46,30 @@ function MessageHeader() {
         <Row>
           <Col>
             <Accordion>
-              <Accordion.Item eventKey="0">
-                <Accordion.Header style={{ padding: '0 1rem'}}>Accordion Item #1</Accordion.Header>
-                <Accordion.Body>
-                  Body
-                </Accordion.Body>
-              </Accordion.Item>
+              <Card>
+                <Card.Header style={{ padding: '0 1rem'}}>
+                  <Accordion.Toggle as={Button} variant="link" eventKey="0">
+                    Click me!
+                  </Accordion.Toggle>
+                </Card.Header>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>Hello! I'm the body</Card.Body>
+                </Accordion.Collapse>
+              </Card>
             </Accordion>
           </Col>
           <Col>
             <Accordion>
-              <Accordion.Item eventKey="0">
-                <Accordion.Header style={{ padding: '0 1rem'}}>Accordion Item #1</Accordion.Header>
-                <Accordion.Body>
-                  Body
-                </Accordion.Body>
-              </Accordion.Item>
+              <Card>
+                <Card.Header style={{ padding: '0 1rem'}}>
+                  <Accordion.Toggle as={Button} variant="link" eventKey="0">
+                    Click me!
+                  </Accordion.Toggle>
+                </Card.Header>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>Hello! I'm the body</Card.Body>
+                </Accordion.Collapse>
+              </Card>
             </Accordion>
           </Col>
         </Row>

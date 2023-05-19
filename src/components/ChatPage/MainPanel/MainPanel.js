@@ -35,25 +35,22 @@ export class MainPanel extends Component {
         messagesArray.push(DataSnapshot.val());
         this.setState({ 
           // 실시간으로 불러온 데이터(messageArray)를 messages(state)로 이동
-          messages: messagesArray,
+          messages : messagesArray,
           // 최초 데이터 불러올 때는 로딩중, (true) 완료 시 false
           messagesLoading : false,
         });
       })
   }
 
-  renderMessages = (messages) => {
+  renderMessages = (messages) => 
     messages.length > 0 && // messages가 하나 이상의 메시지를 가지고 있다면
-    // Message Component 사용
-    console.log("renderMessage 실행");
     messages.map(message => (
         <Message
-          key={message.timeStamp}
+          key={message.timestamp}
           message={message}
           user={this.props.user}
         />
     ))
-  }
 
   render() {
     // render()가 실행될때마다 state에서 messages 가져오기
