@@ -183,3 +183,26 @@ ACTION -> REDUCER -> STORE -> SUBSCRIBE -> React Component -> Dispatch(action)
 
 # mime-types 모듈 적용
  : 업로드된 파일의 타입을 확인하기 위하여 해당 모듈을 설치한다.  
+  
+# 검색으로 메시지 찾기(1) : regrex(정규식 생성)
+```javaScript
+const regex = new RegExp(this.state.searchTerm, "gi");
+```
+`RegExp` 생성자는 패턴을 사용하여 **텍스트를 판별할 때** 사용한다. 즉, 정규 표현식을 생성한다. 이를 이용하여 원하는 문자열이 포함되어있는 데이터를 검색한다.  
+  
+`RegExp`의 func에는 두 가지의 인자가 존재한다.  
+첫 번째 인자 : 검색하고자 하는 문자열  
+두 번째 인자 : 검색 방법 (옵션)
+ -> 옵션의 경우 
+ 1. `g` modifier : **global**. All matches (don't return on first math). 즉, "안녕하세요" 입력 시 그와 관련된 모든 데이터를 반환한다.  
+ 2. `i` modifier : **insensitive**. Case insensitive math (ignores case of [a-zA-Z]). 즉, **대소문자**를 가리지 않고 모두 검색하여 반환한다.  
+  
+# 검색으로 메시지 찾기(2) : reduce (생성된 정규식 판별)
+? 관련 링크 : [mozila](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)
+
+# 검색으로 메시지 찾기(3) : match
+ : `match()`는 특정 텍스트 안에 검색할 단어, 찾고싶은 단어가 있는 경우 해당 텍스트가 문구에 포함되어 있는지 확인할 수 있다.  
+ 또한 `정규표현식`을 사용하여 특정 패턴을 검색하는 것 또한 가능하다.  
+  
+**`해당 문자열.match('찾을 단어')**  
+**-> `match()`함수는 인자에 포함된 문자를 찾으면 이를 반환.**  
