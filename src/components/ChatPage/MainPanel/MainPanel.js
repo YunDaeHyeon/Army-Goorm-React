@@ -15,6 +15,11 @@ export class MainPanel extends Component {
     messages: [],
     // 로딩
     messagesLoading: true,
+
+    // 검색을 진행하기 위한 state들
+    searchTerm: "", // 사용자가 검색한 내용
+    searchResults: [], // 사용자가 검색한 내용과 비슷한 내용 저장
+    searchLoading: false, // 검색이 이루어지는 동안 로딩
   }
 
   componentDidMount(){ // 컴포넌트 마운트 시
@@ -24,6 +29,44 @@ export class MainPanel extends Component {
     // 매개변수는 클릭한 채팅방의 id를 가져와 이를 토대로 메시지 호출
     this.addMessagesListeners(chatRoom.id);
     }
+  }
+
+  /*
+    검색을 수행하는 컴포넌트는 MessageHeader(MainPanel 기준 자식).
+    하지만 실제 검색을 수행시키는 로직이 존재하는 컴포넌트는
+    MainPanel(부모)이기에 이를 연결한다.
+  */
+  handleSearchChange = event => {
+    // MessageHeader 컴포넌트에 존재하는 검색창 onChange 이벤트 연동
+    this.setState({
+      searchTerm: event.target.value,
+      searchLoading: true
+    }, 
+    () => this.handleSearchMessages());
+  }
+
+  // 실제 검색이 이루어지는 로직
+  handleSearchMessages = () => {
+    // state에 존재하는 messages 호출
+    const chatRoomMessages = [...this.state.messages];
+    // 정규식 생성
+    const regex = new RegExp(this.state.searchTerm, "gi");
+    // 메시지가 들어있는 배열(chatRoomMessages)을 정규식 판별(reduce)
+    const searchResults = chatRoomMessages.reduce((acc, message) => {
+      // 검색한 내용과 메시지가 match하거나
+      // 검색한 내용과 사용자 이름이 match하면
+      if(
+        (message.content && message.content.match(regex)) ||
+        message.user.name.match(regex)
+      ){
+        // acc(누산기)에 일치하는 데이터 저장
+        acc.push(message);
+      }
+      // 누적된 데이터(일치되는 데이터들) 반환
+      return acc;
+    }, []);
+    // 검색 결과(acc = searchResults)를 state에 저장
+    this.setState({ searchResults });
   }
 
   addMessagesListeners = (chatRoomId) => {
@@ -53,13 +96,13 @@ export class MainPanel extends Component {
     ))
 
   render() {
-    // render()가 실행될때마다 state에서 messages 가져오기
-    const { messages } = this.state;
+    // render()가 실행될때마다 state에서 messages, searchTerm, searchResults 가져오기
+    const { messages, searchTerm, searchResults } = this.state;
 
     return (
         <div style={{ padding: '2rem 2rem 0 2rem'}}>
             
-            <MessageHeader/>
+            <MessageHeader handleSearchChange={this.handleSearchChange}/>
 
             <div style={{
                 width: '100%',
@@ -70,7 +113,12 @@ export class MainPanel extends Component {
                 marginBottom: '1rem',
                 overflowY: 'auto'
             }}>
-              {this.renderMessages(messages)}
+              { // 만약 검색한 뒤 결과가 존재한다면 검색한 내용 렌더링
+                searchTerm ?
+                this.renderMessages(searchResults) :
+                // 만약, 검색을 하지 않았다면 원래대로
+                this.renderMessages(messages)
+              }
             </div>
 
             <MessageForm/>
