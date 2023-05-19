@@ -20,6 +20,8 @@ function MessageForm() {
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
+  // 이미지 업로드 퍼센티지 state
+  const [percentage, setPercentage] = useState(0);
   const messagesRef = firebase.database().ref("messages");
   // 이미지 업로드 ref
   const inputOpenImageRef = useRef();
@@ -57,7 +59,7 @@ function MessageForm() {
   }
 
   // 이미지 업로드
-  const handleUploadImage = async (event) => {
+  const handleUploadImage = (event) => {
     // 파일 정보 호출
     const file = event.target.files[0];
     // 파일이 존재하지 않는다면
@@ -70,7 +72,16 @@ function MessageForm() {
     // child는 파일의 경로
     try{
       // put의 첫 번째 인자는 file 정보, 두 번째는 파일의 metadata
-      await storageRef.child(filePath).put(file, metadata)
+      let uploadTask = storageRef.child(filePath).put(file, metadata)
+
+      // 파일 저장 퍼센티지 구하기 (리스너 사용)
+      uploadTask.on("state_changed", UploadTaskSnapshot => {
+        const percentage = Math.round(
+          // (얼마나 전송되었는가) / (최종 이미지 크기) * 100
+          (UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
+        ) // 소숫점 반올림
+        setPercentage(percentage); // percentage state 변경
+      });
     }catch(error){
       alert(error);
     }
@@ -116,7 +127,10 @@ function MessageForm() {
             rows={3} />
         </Form.Group>
       </Form>
-      <ProgressBar variant="warning" label="60%" now={60}/>
+      { // 퍼센티지가 0% 혹은 100% 일때는 퍼센티지가 안보이도록.
+        !(percentage === 0 || percentage === 100) &&
+        <ProgressBar variant="warning" label={`${percentage}%`} now={percentage}/>
+      }
       <div>
         {errors.map(errorMessage => 
           <p style={{ color: 'red' }} key={errorMessage}>
