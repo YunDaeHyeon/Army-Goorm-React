@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 // BootStrap
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button';
@@ -21,6 +21,10 @@ function MessageForm() {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const messagesRef = firebase.database().ref("messages");
+  // 이미지 업로드 ref
+  const inputOpenImageRef = useRef();
+  // firebase storage ref
+  const storageRef = firebase.storage().ref();
 
   const handleChange = (event) => {
     setContent(event.target.value);
@@ -44,6 +48,33 @@ function MessageForm() {
     }
     console.log("func createMessage start", message);
     return message; // message 반환
+  }
+
+  // 이미지 업로드 버튼 클릭 (Ref)
+  const handleOpenImageRef = () => {
+    // ref를 이용하여 임의적인 DOM 클릭 발생
+    inputOpenImageRef.current.click();
+  }
+
+  // 이미지 업로드
+  const handleUploadImage = async (event) => {
+    // 파일 정보 호출
+    const file = event.target.files[0];
+    // 파일이 존재하지 않는다면
+    if(!file) return;
+
+    const filePath = `message/public/${file.name}`;
+    const metadata = { contentType: file.type};
+
+    // firebase storage에 이미지 업로드
+    // child는 파일의 경로
+    try{
+      // put의 첫 번째 인자는 file 정보, 두 번째는 파일의 metadata
+      await storageRef.child(filePath).put(file, metadata)
+    }catch(error){
+      alert(error);
+    }
+
   }
 
   const handleSubmit = async () => {
@@ -73,6 +104,7 @@ function MessageForm() {
       }, 5000);
     }
   }
+
   return (
     <div>
       <Form onSubmit={handleSubmit}>
@@ -104,6 +136,7 @@ function MessageForm() {
         </Col>
         <Col>
           <button
+            onClick={handleOpenImageRef}
             className='message-form-button'
             style={{ width: '100%'}}
           >
@@ -111,6 +144,14 @@ function MessageForm() {
           </button>
         </Col>
       </Row>
+
+      <input 
+        style = {{ display: "none"}} 
+        type="file"
+        ref={inputOpenImageRef}
+        onChange={handleUploadImage}
+        />
+
     </div>
   )
 }
