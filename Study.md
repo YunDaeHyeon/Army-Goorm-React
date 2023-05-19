@@ -206,3 +206,35 @@ const regex = new RegExp(this.state.searchTerm, "gi");
   
 **`해당 문자열.match('찾을 단어')`**  
 **-> `match()`함수는 인자에 포함된 문자를 찾으면 이를 반환.**  
+
+# 검색으로 메시지 찾기(4) : 최종 코드 해석
+  
+```javaScript
+// Class Component 기준
+handleSearchMessages = () => {
+    const chatRoomMessages = [...this.state.messages];
+    // regex에 RegExp로 제작한 정규식을 저장. (사용자가 검색하고자 한 데이터를 정규식으로 전환)
+    const regex = new RegExp(this.state.SearchTerm, "gi");
+    // searchResults에 reduce를 이용하여 regex(정규식)을 판별한다.
+    // 첫 번째 인자 : acc(accumulator, 누산기). callback 의 반환값을 누적시킨다.
+    // 두 번째 인자 : currentValue. 현재 요소를 말한다.
+    // 세 번째 인자 : initialValue. acc(누산기)의 초기값을 지정한다.
+    // 이때, 초기값(initialValue)을 제공하지 않으면 배열의 첫 번째 요소를 초기값으로 사용한다. 이때, 빈 배열에서 초기값 없이 reduce()를 호출하면 오류가 발생한다.
+    // reduce 함수의 최종 반환 값은 누적 계산값의 결과 값이다.
+    const searchResults = chatRoomMessages.reduce((acc, message) => {
+        if(
+            // 메시지 내용이 사용자가 검색한 내용(정규식)과 사용자 이름이 매치되면
+            (message.content && message.content.match(regex)) ||
+            message.user.name.match(regex)
+        ){  // 누산기에 매치된 내용을 계속 push 한다.
+            acc.push(message);
+        }
+        // 축적된 내용을 반환한다.
+        return acc;
+        // 초기값은 빈 배열이다.
+    }, []);
+    // 최종 값을 state에 저장하여 화면에 검색된 내용을 뿌린다.
+    this.setState({ searchResults });
+    setTimeout(() => this.setState({ searchLoading: false}), 1000);
+}
+```
