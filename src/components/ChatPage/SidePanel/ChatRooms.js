@@ -6,6 +6,7 @@ import { FaRegSmileWink, FaPlus } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Badge from 'react-bootstrap/Badge';
 // 현재 사용자 state을 가져오기 위한 redux/connect 선언
 // Functional Component는 useSeletor로 가져오지만, Class Component는
 // connect로 가져온다.
@@ -22,9 +23,11 @@ export class ChatRooms extends Component {
     name: "", // 방 생성 제어 state
     description: "", // 방 생성 제어 state
     chatRoomsRef: firebase.database().ref("chatRooms"), // 채팅 룸에 대한 ref
+    messagesRef: firebase.database().ref("messages"), // 메시지에 대한 ref
     chatRooms: [], // 채팅방 리스트
     firstLoad: true, // 채팅방 리스트를 최초로 불러왔을 경우 판단
     activeChatRoomId: "",// 각 채팅방의 ID
+    notifications: [], // 각 채팅방의 알람 수
   }
 
   // 해당 함수는 ChatRooms 컴포넌트 호출 시 실행된다.
@@ -69,7 +72,78 @@ export class ChatRooms extends Component {
         // 불러온 데이터 state 적용
         this.setState({ chatRooms: chatRoomsArray}, 
           () => this.setFirstChatRoom());
+        // DataSnapshot.key는 chatRoomId이다.
+        // 각 채팅방 알람 수 생성 (각 채팅방에 들어오는 메시지의 수 가져오기)
+        this.addNotificationListener(DataSnapshot.key);
     });
+  }
+
+  // 각 채팅방 알람 수 가져오기 (Notification)
+  addNotificationListener = (chatRoomId) => {
+    // firebase에 존재하는 메시지들에게 특정 채팅방 ID에 대한 정보 가져오기
+    // "value"에 대한 설명 : https://firebase.google.com/docs/database/admin/retrieve-data?hl=ko#node.js
+    // 해당 child에 데이터가 추가될 때마다 해당 리스너 호출
+    this.state.messagesRef.child(chatRoomId).on("value", DataSnapshot => {
+      // Datasnapshot -> message의 collection 모음
+      if(this.props.chatRoom){ // 현재 redux에 chatRoom이 존재하면
+        this.handleNotification( // 알람 핸들링 함수
+          chatRoomId,
+          this.props.chatRoom.id,
+          this.state.notifications,
+          DataSnapshot
+        )
+      }
+    })
+  }
+
+  // 알람 핸들링 함수
+  /*
+    첫 번째 param : 각 채팅방의 Id (순서대로, 현재 방 ID 아님)
+    두 번째 param : 현재 접속한 채팅방의 ID
+    세 번째 param : state에 존재하는 각 알람들의 모음 (배열)
+    네 번째 param : 리스너를 통해 불러와진 데이터들 (메시지가 추가된 방)
+  */
+  handleNotification = (chatRoomId, currentChatRoomId, notifications, DataSnapshot) => {
+    // 1. 이미 notifications state 안에 알람 정보가 들어있는 채팅방인지 아닌지 구분
+
+    // notifications에 존재하는 모든 index를 탐색
+    // notification : 배열에 존재하는 각각의 데이터들
+    // findIndex()와 같은 것이 없다면 -1 반환
+    // index에 -1이 반환되었다면 해당 notifications state 내부에는 특정된 채팅방이 존재하지 않음.
+    let index = notifications.findIndex(notification =>
+      notification.id === chatRoomId) // notifications state 특정 index에 각 채팅방의 ID 지정
+    
+    // notification state 안에 해당 채팅방의 알림 정보가 없을 때(즉, 새로 만든 채팅방일 경우)
+    if(index === -1){
+      // 알람 정보가 없을 때(새로 만들어진 채팅방)
+      // 채팅방 하나 하나에 맞는 알림 정보 생성
+      notifications.push({
+        id: chatRoomId, // 채팅방 아이디 지정
+        total: DataSnapshot.numChildren(), // 해당 채팅방 전체 메시지 개수
+        lastKnownTotal: DataSnapshot.numChildren(), // 이전에 확인한 전체 메시지 개수
+        count: 0, // 알림으로 사용할 숫자
+        // !! DataSnapshot.numChildren() : 전체 children 개수 (= 전체 메시지 개수)
+      })
+    }else{ // 이미 해당 채팅방 정보가 존재할 때
+      // 상대방이 채팅을 보내는 해당 채팅방에 있지 않을 때
+      // 같은 채팅방에 상주하면 알람을 지정할 필요 X
+      if(chatRoomId !== currentChatRoomId){
+        // 현재까지 사용자가 확인한 총 메시지 개수
+        let lastTotal = notifications[index].lastKnownTotal;
+
+        // 알림으로 사용할 숫자 지정 (count)
+        // 현재 총 메시지 개수 - 이전에 확인한 총 메시지 개수 > 0
+        // 현재 총 메시지 개수가 10, 이전에 확인한 메시지 개수가 8이면 알림은 2개
+        if(DataSnapshot.numChildren() - lastTotal > 0){
+          // 총 메시지 개수(numChildren()) - 확인한 메시지 개수(lastTotal) = 알람 개수(count)
+          notifications[index].count = DataSnapshot.numChildren() - lastTotal;
+        }
+      }
+      // total property에 현재 전체 메시지 개수 지정
+      notifications[index].total = DataSnapshot.numChildren();
+    }
+    // 각각의 방에게 맞는 알람 정보를 notifications state에 넣어주기
+    this.setState({ notifications });
   }
 
   // 방 생성 Modal 열기
@@ -100,6 +174,21 @@ export class ChatRooms extends Component {
     this.setState({ activeChatRoomId: room.id });
   }
 
+  // 각 채팅방 알람 개수 가져오기
+  // param : 해당 채팅방에 대한 정보
+  getNotificationCount = (room) => {
+    let count = 0;
+    // notifications state에 존재하는 모든 value 탐색
+    this.state.notifications.forEach(notification => {
+      // 알람이 존재하는 id와 현재 채팅방 id가 일치하면
+      if(notification.id === room.id){
+        count = notification.count;
+      }
+    })
+    // 알람이 1개 이상이면 반환 (그렇지 않으면 알람 X)
+    if(count > 0) return 1;
+  } 
+
   // 채팅방 리스트 렌더링
   renderChatRooms = (chatRooms) =>
       // 만약, chatRooms가 0보다 크면 (즉, 채팅방이 1개 이상 있으면)
@@ -115,6 +204,11 @@ export class ChatRooms extends Component {
           onClick={() => this.changeChatRoom(room) /* 클릭한 채팅방 정보 redux 저장 */}
         >
           # {room.name}
+          <Badge style={{ float: 'right', marginTop: '4px'}}
+            pill bg="danger">
+              10
+              {/* {this.getNotificationCount(room)} */}
+          </Badge>
         </li>
       ));
 
@@ -224,6 +318,7 @@ export class ChatRooms extends Component {
 const mapStateToProps = (state) => {
   return{
     user: state.user.currentUser,
+    chatRoom: state.chatRoom.currentChatRoom
   }
 }
 
