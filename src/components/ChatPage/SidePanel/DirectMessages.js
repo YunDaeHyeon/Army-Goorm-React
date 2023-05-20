@@ -5,6 +5,7 @@ import { FaRegSmile } from 'react-icons/fa';
 import firebase from '../../../firebase';
 // redux
 import { connect } from 'react-redux';
+import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoom_action';
 
 export class DirectMessages extends Component {
 
@@ -13,7 +14,7 @@ export class DirectMessages extends Component {
     usersRef : firebase.database().ref("users"),
     // 현재 접속중인 사용자 리스트
     users: [],
-
+    activeChatRoom: "", // 각 DM방을 의미 
   }
 
   componentDidMount(){
@@ -63,13 +64,36 @@ export class DirectMessages extends Component {
   // 사용자 리스트 클릭 (user : 각 사용자의 정보)
   changeChatRoom = (user) => {
     const chatRoomId = this.getChatRoomId(user.uid);
+    // 클릭한 사용자와 대화할 방(DM)을 생성하기 위한 정보 생성
+    const chatRoomData = {
+      id: chatRoomId,
+      name: user.name, // 상대방의 이름으로 방 이름 생성 
+    }
+    // 생성한 정보를 redux에 업로드
+    this.props.dispatch(setCurrentChatRoom(chatRoomData));
+    // DM은 private room을 명시. (현재 대화중인 방(DM)은 private방)
+    this.props.dispatch(setPrivateChatRoom(true));
+    // 해당 사용자 클릭 시(DM대화방)
+    this.setActiveChatRoom(user.uid); // 선택한 사용자의 id 전달
+  }
+
+  // 각 DM 클릭(active) 함수
+  setActiveChatRoom = (userId) => {
+    this.setState({ activeChatRoom: userId });
   }
 
   // JS에서 {}가 존재하면 반환값이 존재해야함.
   renderDirectMessages = (users) => 
     users.length > 0 && // 사용자가 1명 이상 존재하면
     users.map(user => (
-      <li key={user.uid} onClick={() => this.changeChatRoom(user)}>
+      <li 
+        key={user.uid} 
+        style={{ // 클릭한 채팅방(사용자) 클릭 시(active) 색상 변경
+          backgroundColor: user.uid === this.state.activeChatRoom &&
+          "#ffffff45",
+          cursor: 'pointer'
+        }}
+        onClick={() => this.changeChatRoom(user)}>
         # {user.name}
       </li>
     ))

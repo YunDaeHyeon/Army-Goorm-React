@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 // firebase
 import firebase from "../../../firebase";
 // redux action 호출
-import { setCurrentChatRoom } from '../../../redux/actions/chatRoom_action';
+import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoom_action';
 
 export class ChatRooms extends Component {
   // 클래스컴포넌트의 state 선언 방식
@@ -94,6 +94,8 @@ export class ChatRooms extends Component {
   changeChatRoom = (room) => {
     // Class Component에서는 this.props.dispatch()의 형식으로 redux 업로드
     this.props.dispatch(setCurrentChatRoom(room));
+    // 해당 채팅방은 private가 아니다. 즉, public(공개) 채팅방 명시
+    this.props.dispatch(setPrivateChatRoom(false));
     // 선택된 채팅방 active
     this.setState({ activeChatRoomId: room.id });
   }
