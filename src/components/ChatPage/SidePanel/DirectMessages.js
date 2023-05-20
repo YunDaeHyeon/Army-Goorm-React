@@ -42,20 +42,49 @@ export class DirectMessages extends Component {
     });
   }
 
-  renderDirectMessages = () => {
+  // DirectMessage에 사용될 chatRoom ID 생성
+  getChatRoomId = (userId) => {
+    // userId : 클릭한 유저의 ID
+    // currentUserId : 자기 자신의 ID
+    const currentUserId = this.props.user.uid;
 
+    // 만약, 클릭한 사용자의 ID가 자기 자신의 ID보다 크다면
+    return userId > currentUserId 
+    // DirectMessageChatRoomId는 "클릭한 사용자 ID"/"자기 자신의 ID"
+    ? `${userId}/${currentUserId}`
+    // 작지 않다면 "자기 자신의 ID"/"클릭한 사용자 ID"
+    : `${currentUserId}/${userId}`;
+    // 이런 로직을 구성한 이유는 자기 자신이나
+    // 어떤 사람과 직접적으로 채팅을 하기 위해서는
+    // 둘 다 동일한 ChatRoom을 사용해야한다.
+    // 그러므로 동일한 채팅방 ID가 존재해야한다.
   }
 
+  // 사용자 리스트 클릭 (user : 각 사용자의 정보)
+  changeChatRoom = (user) => {
+    const chatRoomId = this.getChatRoomId(user.uid);
+  }
+
+  // JS에서 {}가 존재하면 반환값이 존재해야함.
+  renderDirectMessages = (users) => 
+    users.length > 0 && // 사용자가 1명 이상 존재하면
+    users.map(user => (
+      <li key={user.uid} onClick={() => this.changeChatRoom(user)}>
+        # {user.name}
+      </li>
+    ))
+
   render() {
-    console.log("users", this.state.users);
+    // 현재 존재하는 사용자 리스트 (state)
+    const { users } = this.state;
     return (
       <div>
         <span style={{ display:'flex', alignItems:'center' }}>
-          <FaRegSmile style={{ marginRight: 3 }}/> DIRECT MESSAGES(1)
+          <FaRegSmile style={{ marginRight: 3 }}/> DIRECT MESSAGES({users.length})
         </span>
 
         <ul style={{ listStyleType: 'none', padding: 0}}>
-          {this.renderDirectMessages()}
+          {this.renderDirectMessages(users)}
         </ul>
       </div>
     )
