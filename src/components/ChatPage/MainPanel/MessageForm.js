@@ -15,6 +15,8 @@ import "./MessageForm_style.css";
 function MessageForm() {
   // redux에 존재하는 채팅방 리스트 불러오기
   const chatRoom = useSelector(state => state.chatRoom.currentChatRoom);
+  // public, private 판별
+  const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
   // redux에 존재하는 사용자 리스트 불러오기
   const user = useSelector(state => state.user.currentUser);
   const [content, setContent] = useState("");
@@ -58,6 +60,17 @@ function MessageForm() {
     inputOpenImageRef.current.click();
   }
 
+  // 이미지 업로드 되는 방이 public인지 private인지
+  const getPath = () => {
+    if(isPrivateChatRoom){
+      // private방의 경우 id가 자신의 ID+상대방 ID로 합쳐지기에
+      // firebase storage에도 똑같이 자신의 ID, 상대방 ID를 이용한다.
+      return `/message/private/${chatRoom.id}`;
+    }else{
+      return `/message/public`;
+    }
+  }
+
   // 이미지 업로드
   const handleUploadImage = (event) => {
     // 파일 정보 호출
@@ -65,7 +78,7 @@ function MessageForm() {
     // 파일이 존재하지 않는다면
     if(!file) return;
 
-    const filePath = `message/public/${file.name}`;
+    const filePath = `${getPath()}/${file.name}`;
     const metadata = { contentType: file.type};
 
     // firebase storage에 이미지 업로드
