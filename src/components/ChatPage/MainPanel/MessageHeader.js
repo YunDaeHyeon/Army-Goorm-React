@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // BootStrap
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -29,6 +29,33 @@ function MessageHeader({handleSearchChange}) {
   const [isFavorited, setIsFavorited] = useState(false);
   // firebase database 접근
   const usersRef = firebase.database().ref("users");
+
+  useEffect(() => {
+    if(chatRoom && user){
+      addFavoriteListener(user.uid, chatRoom.id);
+    }
+  }, []);
+
+  // 새로고침 할때 즐겨찾기 불러오기
+  const addFavoriteListener = (userId, chatRoomId) => {
+    usersRef
+      .child(userId)
+      .child("favorited")
+      .once("value") // firebase에서 단 한번만 가져온다.
+      .then(data => {
+        // 만약 응답된 데이터가 null면 사용자가 즐겨찾기한 방이 없다는 것.
+        if(data.val() !== null){ // 즐겨찾기한 방이 존재하면
+          // 응답된 객체에서 value 추출
+          const chatRoomIds = Object.keys(data.val());
+          // 이미 해당 채팅방이 즐겨찾기인지 판별한다.
+          // 즉, chatRoomIds에 데이터가 존재한다면 즐겨찾기 한 채팅방
+          // 결론 : 새로고침 했는데 해당 채팅방이 즐겨찾기한 상태면
+          // isAlreayFavorited는 true
+          const isAlreadyFavorited = chatRoomIds.includes(chatRoomId)
+          setIsFavorited(isAlreadyFavorited);
+        }
+      })
+  }
 
   // 즐겨찾기 방 설정
   const handleFavorite = () => { 
