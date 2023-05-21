@@ -18,9 +18,12 @@ function Message({ message , user }) {
 
   // 자신이 직접 보낸 메시지는 background를 회색으로 표시
   const isMessageMine = (message, user) => {
-    // message는 화면에 보여지는 메시지의 정보
-    // user는 현재 접속중인 사용자의 정보
-    return message.user.id === user.uid;
+    // user가 존재할 때
+    if(user){
+      // message는 화면에 보여지는 메시지의 정보
+      // user는 현재 접속중인 사용자의 정보
+      return message.user.id === user.uid;
+    }
   }
 
   return (
