@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 // BootStrap
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -13,15 +13,54 @@ import Button from 'react-bootstrap/Button';
 import { useSelector } from 'react-redux';
 // Icon
 import { FaLock, FaLockOpen } from 'react-icons/fa'
-import { MdFavorite } from 'react-icons/md';
+import { MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { AiOutlineSearch } from 'react-icons/ai';
+// firebase
+import firebase from '../../../firebase';
 
 function MessageHeader({handleSearchChange}) {
   // 방 리스트 불러오기 (공개, public)
   const chatRoom = useSelector(state => state.chatRoom.currentChatRoom);
   // 비공개(DM), 공개(오픈 채팅방) 판별 state 불러오기
   const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
+  // 현재 접속중인 사용자 가져오기
+  const user = useSelector(state => state.user.currentUser);
+  // 즐겨찾기 방 state
+  const [isFavorited, setIsFavorited] = useState(false);
+  // firebase database 접근
+  const usersRef = firebase.database().ref("users");
 
+  // 즐겨찾기 방 설정
+  const handleFavorite = () => { 
+    // 해당 채팅방이 즐겨찾기 활성화 -> 비활성화라면 정보 제거
+    if(isFavorited){
+      usersRef
+        .child(`${user.uid}/favorited`)
+        .child(chatRoom.id)
+        .remove(error => {
+          // 에러 발생 시
+          if(error !== null){
+            console.log("즐겨찾기 오류", error);
+          }
+        });
+      // state 갱신
+      setIsFavorited(prev => !prev);
+    }else{ // 해당 채팅방이 비활성화 -> 활성화라면 정보 추가
+      usersRef
+        .child(`${user.uid}/favorited`).update({
+          [chatRoom.id]: {
+            name: chatRoom.name,
+            description: chatRoom.description,
+            createBy: {
+              name: chatRoom.createBy.name,
+              image: chatRoom.createBy.image
+            }
+          }
+        })
+      // state 갱신
+      setIsFavorited(prev => !prev);
+    }
+  }
 
   return (
     <div style={{
@@ -41,7 +80,18 @@ function MessageHeader({handleSearchChange}) {
               <FaLock style={{ marginBottom: '10px' }}/> : 
               <FaLockOpen style={{ marginBottom: '10px' }}/>
             }
-            {chatRoom && chatRoom.name} <MdFavorite/></h2></Col>
+            {chatRoom && chatRoom.name}
+            { // public 채팅방일 경우
+              !isPrivateChatRoom &&
+              <span style = {{ cursor: 'pointer'}} onClick={handleFavorite}>
+                { // 즐겨찾기 방(초기값 : false)이라면
+                isFavorited ?
+                <MdFavorite style={{ marginBottom: '10px'}}/> 
+                : 
+                <MdFavoriteBorder style={{ marginBottom: '10px'}}/>
+                }
+              </span>
+            }</h2></Col>
           <Col>
             <InputGroup className='md-3'>
                 <InputGroup.Text id="basic-addon1"><AiOutlineSearch/></InputGroup.Text>
