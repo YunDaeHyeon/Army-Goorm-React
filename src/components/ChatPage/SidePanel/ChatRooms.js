@@ -203,12 +203,7 @@ export class ChatRooms extends Component {
           }}
           onClick={() => this.changeChatRoom(room) /* 클릭한 채팅방 정보 redux 저장 */}
         >
-          # {room.name}
-          <Badge style={{ float: 'right', marginTop: '4px'}}
-            pill bg="danger">
-              10
-              {/* {this.getNotificationCount(room)} */}
-          </Badge>
+          # {room.name} : {this.getNotificationCount(room)}
         </li>
       ));
 
