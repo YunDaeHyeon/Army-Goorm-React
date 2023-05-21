@@ -37,12 +37,16 @@ export class ChatRooms extends Component {
     this.AddChatRoomsListeners();
   }
 
-  // 해당 함수는 ChatRooms가 파괴되었을 때 실행된다.
+  // 해당 함수는 ChatRooms Component가 파괴되었을 때 실행된다.
   // ChatRooms 컴포넌트는 최초 실행 시 파이어베이스에서 Listener를 통하여
   // 계속해서 데이터를 주고받는다. 컴포넌트가 필요하지 않을때는 이를 제한한다.
   componentWillUnmount(){
     // .off()를 통하여 Listener를 off 시키면 더 이상 데이터가 전달되지 않는다.
     this.state.chatRoomsRef.off();
+    // 각 채팅방들에 대한 message 리스너 off
+    this.state.chatRooms.forEach(chatRoom => {
+      this.state.messagesRef.child(chatRoom.id).off();
+    });
   }
 
   // 만약, 최초로 새로고침이 발생했을 경우 임의적으로 첫 번째 채팅방을 state에 저장한다.
@@ -172,6 +176,31 @@ export class ChatRooms extends Component {
     this.props.dispatch(setPrivateChatRoom(false));
     // 선택된 채팅방 active
     this.setState({ activeChatRoomId: room.id });
+    // 만약, 해당 채팅방에 알람이 있을 때 채팅방 입장 시 알람 초기화
+    this.clearNotifications();
+  }
+
+  // 채팅방 입장 시 알람 초기화
+  clearNotifications = () => {
+    // 만약, 알람이 없으면 findIndex는 -1을 반환
+    // notification.id : 알람을 알고자 하는 채팅방 ID
+    // this.props.chatRoom.id : 현재 접속한 채팅방 ID
+    let index = this.state.notifications.findIndex(
+      notification => notification.id === this.props.chatRoom.id
+    )
+
+    // 해당 채팅방에 notifications 에 대한 값이 들어있다면 (알람이 있다면)
+    if(index !== -1){
+      // 알람 메시지 수 갱신을 위한 새로운 변수 선언
+      let updatedNotifications = [...this.state.notifications];
+      // 이전에 확인한 메시지 개수 갱신
+      // index : 위에서 notifications state에서 가져온 특정 채팅방 알람 정보
+      updatedNotifications[index].lastKnownTotal = this.state.notifications[index].total;
+      // 알람 수 초기화
+      updatedNotifications[index].count = 0;
+      // state 갱신
+      this.setState({ notifications: updatedNotifications });
+    }
   }
 
   // 각 채팅방 알람 개수 가져오기
