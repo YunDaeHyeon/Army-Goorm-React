@@ -24,7 +24,7 @@ export class Favorited extends Component {
 
   // 즐겨찾기 추가/제거 리스너 off
   removeFavoriteListener = (userId) => {
-    this.state.usersRef.child(`${userId}/favorited`).off();
+    this.state.usersRef.child(userId).child("favorited").off();
   }
 
   componentDidMount(){
