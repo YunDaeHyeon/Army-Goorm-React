@@ -67,6 +67,7 @@ export class DirectMessages extends Component {
     // 클릭한 사용자와 대화할 방(DM)을 생성하기 위한 정보 생성
     const chatRoomData = {
       id: chatRoomId,
+      image: user.image,
       name: user.name, // 상대방의 이름으로 방 이름 생성 
     }
     // 생성한 정보를 redux에 업로드

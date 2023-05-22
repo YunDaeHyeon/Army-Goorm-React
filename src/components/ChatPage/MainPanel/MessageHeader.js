@@ -6,15 +6,11 @@ import Col from 'react-bootstrap/Col';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Image from 'react-bootstrap/Image';
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
 // react-redux
 import { useSelector } from 'react-redux';
 // Icon
-import { FaLock, FaLockOpen } from 'react-icons/fa'
-import { MdFavorite, MdFavoriteBorder } from 'react-icons/md';
-import { AiOutlineSearch } from 'react-icons/ai';
+import { FaRegPaperPlane, FaLockOpen } from 'react-icons/fa';
+import { AiOutlineSearch, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 // firebase
 import firebase from '../../../firebase';
 
@@ -101,21 +97,32 @@ function MessageHeader({handleSearchChange}) {
       <Container>
         <Row>
           <Col><h2>
-            { // public room이라면 해제된 자물쇠,
-              // private room이라면 자물쇠
-              isPrivateChatRoom ?
-              <FaLock style={{ marginBottom: '10px' }}/> : 
-              <FaLockOpen style={{ marginBottom: '10px' }}/>
+            { // public room이라면 채팅방(자물쇠)
+              // private room이라면 DM(종이비행기)
+              isPrivateChatRoom ? (
+                <>
+                  <FaRegPaperPlane style={{ marginBottom: '10px' }}/>{" "}
+                  <Image
+                    src={chatRoom && chatRoom.image}
+                    roundedCircle style={{ width: '30px', height: '30px'}}
+                  />{chatRoom && chatRoom.name}
+                </>
+              )
+              : (
+                <>
+                  <FaLockOpen style={{ marginBottom: '10px' }}/>{" "}
+                  {chatRoom && chatRoom.name}
+                </>
+              )
             }
-            {chatRoom && chatRoom.name}
             { // public 채팅방일 경우
               !isPrivateChatRoom &&
               <span style = {{ cursor: 'pointer'}} onClick={handleFavorite}>
                 { // 즐겨찾기 방(초기값 : false)이라면
                 isFavorited ?
-                <MdFavorite style={{ marginBottom: '10px'}}/> 
+                <AiFillStar style={{ marginBottom: '10px'}}/> 
                 : 
-                <MdFavoriteBorder style={{ marginBottom: '10px'}}/>
+                <AiOutlineStar style={{ marginBottom: '10px'}}/>
                 }
               </span>
             }</h2></Col>
@@ -131,19 +138,29 @@ function MessageHeader({handleSearchChange}) {
             </InputGroup>
           </Col>
         </Row>
-        <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
-          <p>
-            <Image
-              src={chatRoom && chatRoom.createBy.image}
-              roundedCircle style={{ width: '30px', height: '30px'}}
-            />{" "}{chatRoom && chatRoom.createBy.name}
-          </p>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-start'}}>
-          <p>
-            {chatRoom && chatRoom.description}{" "}
-          </p>
-        </div>
+          { // public 채팅방일 경우
+            !isPrivateChatRoom ?
+              <>
+                <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+                  <p>
+                  <Image
+                    src={chatRoom && chatRoom.createBy.image}
+                    roundedCircle style={{ width: '30px', height: '30px'}}
+                  />{" "}{chatRoom && chatRoom.createBy.name}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-start'}}>
+                  <p>
+                    {chatRoom && chatRoom.description}{" "}
+                  </p>
+                </div>
+              </> :
+              <>
+                <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+                  <p>Direct Message 입니다.</p>
+                </div>
+              </>
+          }
       </Container>
     </div>
   )
