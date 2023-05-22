@@ -139,40 +139,11 @@ function MessageHeader({handleSearchChange}) {
             />{" "}{chatRoom && chatRoom.createBy.name}
           </p>
         </div>
-        <Row>
-          <Col>
-            <Accordion>
-              <Card>
-                <Card.Header style={{ padding: '0 1rem'}}>
-                  <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                    Description
-                  </Accordion.Toggle>
-                </Card.Header>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    {
-                      chatRoom && chatRoom.description
-                    }
-                  </Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion>
-          </Col>
-          <Col>
-            <Accordion>
-              <Card>
-                <Card.Header style={{ padding: '0 1rem'}}>
-                  <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                    Click me!
-                  </Accordion.Toggle>
-                </Card.Header>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>Hello! I'm the body</Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion>
-          </Col>
-        </Row>
+        <div style={{ display: 'flex', justifyContent: 'flex-start'}}>
+          <p>
+            {chatRoom && chatRoom.description}{" "}
+          </p>
+        </div>
       </Container>
     </div>
   )
