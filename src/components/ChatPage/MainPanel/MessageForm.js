@@ -29,6 +29,8 @@ function MessageForm() {
   const inputOpenImageRef = useRef();
   // firebase storage ref
   const storageRef = firebase.storage().ref();
+  // 실시간 타이핑 여부 ref
+  const typingRef = firebase.database().ref("typing");
 
   const handleChange = (event) => {
     setContent(event.target.value);
@@ -136,6 +138,10 @@ function MessageForm() {
         .child(chatRoom.id)
         .push()
         .set(createMessage())
+      
+      // 메시지 전달 시 기존 타이핑 정보 제거
+      typingRef.child(chatRoom.id).child(user.uid).remove();
+      
       // 에러가 없으면 저장 성공. 따라서 관련된 state 변환
       setLoading(false);
       setContent("");
@@ -150,11 +156,28 @@ function MessageForm() {
     }
   }
 
+  // 메시지 입력 창 키다운 핸들러
+  const handleKeyDown = () => {
+    // 만약 타이핑 중이라면 (입력 중인 내용이 존재한다면)
+    if(content){
+      typingRef
+        .child(chatRoom.id)
+        .child(user.uid)
+        .set(user.displayName);
+    } else { // 타이핑 중이 아니라면 (입력 된 내용이 없다면)
+      typingRef
+        .child(chatRoom.id)
+        .child(user.uid)
+        .remove();
+    }
+  }
+
   return (
     <div>
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="exampleForm.ControlTextarea1">
           <Form.Control 
+            onKeyDown={handleKeyDown}
             value={content}
             onChange={handleChange}
             as="textarea" 
