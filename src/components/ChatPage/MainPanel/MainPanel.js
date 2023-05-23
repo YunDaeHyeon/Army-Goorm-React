@@ -7,6 +7,8 @@ import { connect } from 'react-redux';
 import firebase from '../../../firebase';
 
 export class MainPanel extends Component {
+  // Class 컴포넌트 ref 생성
+  messageEndRef = React.createRef();
 
   state = {
     // firebase 접근 state
@@ -34,6 +36,13 @@ export class MainPanel extends Component {
       this.addMessagesListeners(chatRoom.id);
       // 타이핑 정보 불러오기
       this.addTypingListeners(chatRoom.id);
+    }
+  }
+
+  componentDidUpdate(){ // 컴포넌트 업데이트 시
+    // 해당 ref가 존재할 때
+    if(this.messageEndRef){
+      this.messageEndRef.scrollIntoView({ behavior: "smooth"});
     }
   }
 
@@ -167,6 +176,8 @@ export class MainPanel extends Component {
               this.renderMessages(messages)
           }
           {this.renderTypingUsers(typingUsers) /* 타이핑 중이라는 UI 렌더링 */}
+          {/* 스크롤 자동 내려가기 기준 (node : 해당 element 가져오기) */}
+          <div ref={node => (this.messageEndRef = node)}/> 
         </div>
 
         <MessageForm />
