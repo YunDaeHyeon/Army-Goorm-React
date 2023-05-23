@@ -20,6 +20,10 @@ export class MainPanel extends Component {
     searchTerm: "", // 사용자가 검색한 내용
     searchResults: [], // 사용자가 검색한 내용과 비슷한 내용 저장
     searchLoading: false, // 검색이 이루어지는 동안 로딩
+    // 타이핑 ref
+    typingRef: firebase.database().ref("typing"),
+    // 타이핑 state
+    typingUsers: [],
   }
 
   componentDidMount(){ // 컴포넌트 마운트 시
@@ -28,7 +32,42 @@ export class MainPanel extends Component {
     if(chatRoom){ // chatRoom이 존재하면 (존재하지 않다는 것은 에러.)
     // 매개변수는 클릭한 채팅방의 id를 가져와 이를 토대로 메시지 호출
     this.addMessagesListeners(chatRoom.id);
+    // 타이핑 정보 불러오기
+    this.addTypingListeners(chatRoom.id);
     }
+  }
+
+  // 타이핑 정보 불러오기
+  addTypingListeners = (chatRoomId) => {
+    // 타이핑 관련 유저 정보
+    let typingUsers = [];
+    // typing child가 추가되는 이벤트 감시 리스너(타이핑 진행 중)
+    this.state.typingRef.child(chatRoomId).on("child_added",
+      DataSnapshot => {
+        // 본인이 타이핑 중인 상황은 제외한다.
+        if(DataSnapshot.key !== this.props.user.uid){
+          // concat : 새로운 배열 생성
+          typingUsers = typingUsers.concat({
+            id: DataSnapshot.key,
+            name: DataSnapshot.val()
+          });
+          // 불러와진 타이핑 정보 state 추가
+          this.setState({ typingUsers });
+        }
+      })
+    
+    // typing child가 제거되는 이벤트 감시 리스너 (타이핑이 끝나거나 안할 때)
+    this.state.typingRef.child("chatRoomId").on("child_removed",
+      DataSnapshot => {
+        // typingUsers state안에 존재하는 유저 정보가 삭제된 타이핑 정보에 존재하면
+        // index 반환, 만약 정보가 존재하지 않으면 -1 반환
+        const index = typingUsers.findIndex(user => user.id === DataSnapshot.key);
+        // 만약, 지워진 유저 정보가 존재한다면 기존 state에서 해당 유저 제거
+        if(index !== -1){
+          typingUsers = typingUsers.fillter(user => user.id !== DataSnapshot.key);
+          this.setState({ typingUsers });
+        }
+      });
   }
 
   /*
