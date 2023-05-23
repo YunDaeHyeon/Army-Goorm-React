@@ -157,7 +157,11 @@ function MessageForm() {
   }
 
   // 메시지 입력 창 키다운 핸들러
-  const handleKeyDown = () => {
+  const handleKeyDown = (event) => {
+    // ctrl + Enter 시 메시지 입력 (13 : 엔터키)
+    if(event.ctrlKey && event.keyCode === 13){
+      handleSubmit();
+    }
     // 만약 타이핑 중이라면 (입력 중인 내용이 존재한다면)
     if(content){
       typingRef
