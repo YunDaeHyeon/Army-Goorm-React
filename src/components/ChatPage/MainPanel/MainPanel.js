@@ -26,14 +26,14 @@ export class MainPanel extends Component {
     typingUsers: [],
   }
 
-  componentDidMount(){ // 컴포넌트 마운트 시
+  componentDidMount() { // 컴포넌트 마운트 시
     const { chatRoom } = this.props; // props(state)에 존재하는 chatRoom 가져오기
 
-    if(chatRoom){ // chatRoom이 존재하면 (존재하지 않다는 것은 에러.)
-    // 매개변수는 클릭한 채팅방의 id를 가져와 이를 토대로 메시지 호출
-    this.addMessagesListeners(chatRoom.id);
-    // 타이핑 정보 불러오기
-    this.addTypingListeners(chatRoom.id);
+    if (chatRoom) { // chatRoom이 존재하면 (존재하지 않다는 것은 에러.)
+      // 매개변수는 클릭한 채팅방의 id를 가져와 이를 토대로 메시지 호출
+      this.addMessagesListeners(chatRoom.id);
+      // 타이핑 정보 불러오기
+      this.addTypingListeners(chatRoom.id);
     }
   }
 
@@ -45,7 +45,7 @@ export class MainPanel extends Component {
     this.state.typingRef.child(chatRoomId).on("child_added",
       DataSnapshot => {
         // 본인이 타이핑 중인 상황은 제외한다.
-        if(DataSnapshot.key !== this.props.user.uid){
+        if (DataSnapshot.key !== this.props.user.uid) {
           // concat : 새로운 배열 생성
           typingUsers = typingUsers.concat({
             id: DataSnapshot.key,
@@ -55,7 +55,7 @@ export class MainPanel extends Component {
           this.setState({ typingUsers });
         }
       })
-    
+
     // typing child가 제거되는 이벤트 감시 리스너 (타이핑이 끝나거나 안할 때)
     this.state.typingRef.child("chatRoomId").on("child_removed",
       DataSnapshot => {
@@ -63,8 +63,8 @@ export class MainPanel extends Component {
         // index 반환, 만약 정보가 존재하지 않으면 -1 반환
         const index = typingUsers.findIndex(user => user.id === DataSnapshot.key);
         // 만약, 지워진 유저 정보가 존재한다면 기존 state에서 해당 유저 제거
-        if(index !== -1){
-          typingUsers = typingUsers.fillter(user => user.id !== DataSnapshot.key);
+        if (index !== -1) {
+          typingUsers = typingUsers.filter(user => user.id !== DataSnapshot.key);
           this.setState({ typingUsers });
         }
       });
@@ -80,8 +80,8 @@ export class MainPanel extends Component {
     this.setState({
       searchTerm: event.target.value,
       searchLoading: true
-    }, 
-    () => this.handleSearchMessages());
+    },
+      () => this.handleSearchMessages());
   }
 
   // 실제 검색이 이루어지는 로직
@@ -94,10 +94,10 @@ export class MainPanel extends Component {
     const searchResults = chatRoomMessages.reduce((acc, message) => {
       // 검색한 내용과 메시지가 match하거나
       // 검색한 내용과 사용자 이름이 match하면
-      if(
+      if (
         (message.content && message.content.match(regex)) ||
         message.user.name.match(regex)
-      ){
+      ) {
         // acc(누산기)에 일치하는 데이터 저장
         acc.push(message);
       }
@@ -115,61 +115,70 @@ export class MainPanel extends Component {
       // child_added 이벤트 리스너 실행 (실시간으로 데이터 가져오기)
       .on("child_added", DataSnapshot => {
         messagesArray.push(DataSnapshot.val());
-        this.setState({ 
+        this.setState({
           // 실시간으로 불러온 데이터(messageArray)를 messages(state)로 이동
-          messages : messagesArray,
+          messages: messagesArray,
           // 최초 데이터 불러올 때는 로딩중, (true) 완료 시 false
-          messagesLoading : false,
+          messagesLoading: false,
         });
       })
   }
 
-  renderMessages = (messages) => 
+  renderMessages = (messages) =>
     messages.length > 0 && // messages가 하나 이상의 메시지를 가지고 있다면
     messages.map(message => (
-        <Message
-          key={message.timestamp}
-          message={message}
-          user={this.props.user}
-        />
+      <Message
+        key={message.timestamp}
+        message={message}
+        user={this.props.user}
+      />
     ))
+
+  // 타이핑 중
+  renderTypingUsers = (typingUsers) =>
+    // 해당 사용자가 타이핑 중이라면
+    typingUsers.length > 0 &&
+    typingUsers.map(user => (
+      <span>{user.name}님이 채팅을 입력하고 있습니다...</span>
+    ));
 
   render() {
     // render()가 실행될때마다 state에서 messages, searchTerm, searchResults 가져오기
-    const { messages, searchTerm, searchResults } = this.state;
+    const { messages, searchTerm, searchResults, typingUsers } = this.state;
 
     return (
-        <div style={{ padding: '2rem 2rem 0 2rem'}}>
-            
-            <MessageHeader handleSearchChange={this.handleSearchChange}/>
+      <div style={{ padding: '2rem 2rem 0 2rem' }}>
 
-            <div style={{
-                width: '100%',
-                height: '450px',
-                border: '.2rem solid #ececec',
-                borderRadius: '4px',
-                padding: '1rem',
-                marginBottom: '1rem',
-                overflowY: 'auto'
-            }}>
-              { // 만약 검색한 뒤 결과가 존재한다면 검색한 내용 렌더링
-                searchTerm ?
-                this.renderMessages(searchResults) :
-                // 만약, 검색을 하지 않았다면 원래대로
-                this.renderMessages(messages)
-              }
-            </div>
+        <MessageHeader handleSearchChange={this.handleSearchChange} />
 
-            <MessageForm/>
-
+        <div style={{
+          width: '100%',
+          height: '450px',
+          border: '.2rem solid #ececec',
+          borderRadius: '4px',
+          padding: '1rem',
+          marginBottom: '1rem',
+          overflowY: 'auto'
+        }}>
+          { // 만약 검색한 뒤 결과가 존재한다면 검색한 내용 렌더링
+            searchTerm ?
+              this.renderMessages(searchResults) :
+              // 만약, 검색을 하지 않았다면 원래대로
+              this.renderMessages(messages)
+          }
+          {this.renderTypingUsers(typingUsers) /* 타이핑 중이라는 UI 렌더링 */}
         </div>
+
+        <MessageForm />
+
+      </div>
     )
   }
 }
 
 // redux에 있는 state를 prop으로 호출
 const mapStateToProps = state => {
-  return{
+  return {
     user: state.user.currentUser,
     chatRoom: state.chatRoom.currentChatRoom
   }
