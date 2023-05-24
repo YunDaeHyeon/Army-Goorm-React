@@ -5,6 +5,8 @@ import MessageForm from './MessageForm';
 import Message from './Message';
 import { connect } from 'react-redux';
 import firebase from '../../../firebase';
+// components
+import Skeleton from '../../../commons/components/Skeleton';
 
 export class MainPanel extends Component {
   // Class 컴포넌트 ref 생성
@@ -151,9 +153,22 @@ export class MainPanel extends Component {
       <span>{user.name}님이 채팅을 입력하고 있습니다...</span>
     ));
 
+  // 스켈레톤 애니메이션 처리
+  renderMessageSkeleton = (loading, messages) =>
+      // loading이 true 일때만 (데이터가 다 불러와지지 않았을 때)
+      // 똑같은 컴포넌트를 N번 이상 나타내고 싶을 때는 Array Constructor 사용
+      loading && (
+        <>
+          { [...Array(10)].map((undefined, i) => (
+            <Skeleton key={i}/>
+          ))
+          }
+        </>
+      )
+
   render() {
     // render()가 실행될때마다 state에서 messages, searchTerm, searchResults 가져오기
-    const { messages, searchTerm, searchResults, typingUsers } = this.state;
+    const { messages, searchTerm, searchResults, typingUsers, messagesLoading } = this.state;
 
     return (
       <div style={{ padding: '2rem 2rem 0 2rem' }}>
@@ -169,6 +184,9 @@ export class MainPanel extends Component {
           marginBottom: '1rem',
           overflowY: 'auto'
         }}>
+          { // 스켈레톤 애니메이션 처리
+            this.renderMessageSkeleton(messagesLoading, messages)
+          }
           { // 만약 검색한 뒤 결과가 존재한다면 검색한 내용 렌더링
             searchTerm ?
               this.renderMessages(searchResults) :
